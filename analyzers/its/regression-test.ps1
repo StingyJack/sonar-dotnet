@@ -39,7 +39,6 @@ function Prepare-Project([string]$ProjectName){
     $Content = Get-Content -Path $SourcePath -Raw
 
     if($ruleId){
-        $RuleFragment = "    <Rule><Key>$ruleId</Key></Rule>"
     } else {
         $HotspotFiles = Get-ChildItem ..\rspec -Filter *.json -Recurse | Select-String "SECURITY_HOTSPOT" | Select-Object -ExpandProperty FileName
         $HotspotIDs = $HotspotFiles -Replace "_c#.json", "" -Replace "_vb.net.json", "" | Select-Object -Unique
