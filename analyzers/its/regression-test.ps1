@@ -28,6 +28,7 @@ if ($PSBoundParameters['Verbose'] -Or $PSBoundParameters['Debug']) {
     $global:DebugPreference = "Continue"
 }
 
+# Enable SECURITY_HOTSPOT rules
 function Prepare-Project([string]$ProjectName){
     $Output = ".\output\$ProjectName"
     New-Item -ItemType directory -Path $Output | out-null
@@ -39,7 +40,11 @@ function Prepare-Project([string]$ProjectName){
     $Content = Get-Content -Path $SourcePath -Raw
 
     if($ruleId){
+        # If running the tests for a single rule, we should first check if it's a SECURITY_HOTSPOT before enabling it in SonarLint.xml.
+        # For the sake of simplicity, we add it always. If it's not a SECURITY_HOTSPOT, mentioning in SonarLint.xml won't have any effect.
+        $RuleFragment = "    <Rule><Key>$ruleId</Key></Rule>"
     } else {
+        # Here we are running with all rules, so we want all SECURITY_HOTSPOT rules to be enabled.
         $HotspotFiles = Get-ChildItem ..\rspec -Filter *.json -Recurse | Select-String "SECURITY_HOTSPOT" | Select-Object -ExpandProperty FileName
         $HotspotIDs = $HotspotFiles -Replace "_c#.json", "" -Replace "_vb.net.json", "" | Select-Object -Unique
         $RuleFragment = ""
